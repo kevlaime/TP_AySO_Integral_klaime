@@ -11,26 +11,30 @@ clear
 #  - Generar los archivos de logs requeridos.
 #
 ###############################
-LISTA=$1
+#!/bin/bash
+clear
 
+LISTA=$1
 LOG_FILE="/var/log/status_url.log"
 
+# Crea el archivo de log si no existe
+sudo touch "$LOG_FILE"
+
+# Configura el separador para leer línea por línea
 ANT_IFS=$IFS
 IFS=$'\n'
 
-#---- Dentro del bucle ----#
-  # Obtener el código de estado HTTP
+# Recorre cada URL de la lista (ignorando líneas con #)
+for URL in $(grep -v ^# "$LISTA"); do
+  # Obtener el código de estado HTTP (HEAD request)
   STATUS_CODE=$(curl -LI -o /dev/null -w '%{http_code}\n' -s "$URL")
 
-  # Fecha y hora actual en formato yyyymmdd_hhmmss
+  # Fecha y hora actual
   TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 
+  # Registrar en el log
+  echo "$TIMESTAMP - Code:$STATUS_CODE - URL:$URL" | sudo tee -a "$LOG_FILE"
+done
 
- # Registrar en el archivo /var/log/status_url.log
-  echo "$TIMESTAMP - Code:$STATUS_CODE - URL:$URL" |sudo tee -a  "$LOG_FILE"
-
-
-
-#-------------------------#
-
+# Restaura el separador original
 IFS=$ANT_IFS

@@ -21,7 +21,7 @@ for LINEA in `cat $LISTA |  grep -v ^#`
 do
 	USUARIO=$(echo  $LINEA |awk -F ':' '{print $1}')
 	GRUPO=$(echo  $LINEA |awk -F ':' '{print $2}')
-	echo "sudo useradd -m -s /bin/bash -g $GRUPO $USUARIO"
+	sudo useradd -m -s /bin/bash -g "$GRUPO" "$USUARIO"
+	echo "$USUARIO:$(sudo grep "^vagrant:" /etc/shadow | cut -d: -f2)" | sudo chpasswd -e
 done
 IFS=$ANT_IFS
-
